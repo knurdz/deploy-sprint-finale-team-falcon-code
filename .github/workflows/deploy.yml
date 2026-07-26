@@ -19,6 +19,30 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  smoke-test:
+    name: Run Post-Deploy Smoke Tests
+    needs: [request-deploy] 
+    runs-on: ubuntu-latest
+    env:
+      PUBLIC_URL: ${{ secrets.PUBLIC_URL }}
+    steps:
+      - name: Check / /health and /status
+        run: |
+          set -euo pipefail
+          
+          # Fixed variable name from PUBLIC_URI to PUBLIC_URL
+          base_url="${PUBLIC_URL:?PUBLIC_URL required}"
+          
+          echo "Checking $base_url/"
+          curl --fail "$base_url/"
+          
+          echo "Checking $base_url/health"
+          curl --fail "$base_url/health"
+          
+          echo "Checking $base_url/status"
+          curl --fail "$base_url/status"
+          
+          echo "T19 smoke tests passed"
   request-deploy:
     name: Request deployer publish
     if: >-
