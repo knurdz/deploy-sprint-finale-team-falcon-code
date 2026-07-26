@@ -1,0 +1,93 @@
+name: PR Preview
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    name: Build PR preview evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout exact PR commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: team-site/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: team-site
+
+      - name: Build preview
+        run: npm run build
+        working-directory: team-site
+
+      - name: Write preview evidence
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          ARTIFACT_NAME: pr-preview-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          evidence = {
+              "task": "T11",
+              "preview": True,
+              "pullRequest": int(os.environ["PR_NUMBER"]),
+              "commit": os.environ["PR_HEAD_SHA"],
+              "artifact": os.environ["ARTIFACT_NAME"],
+              "workflowRun": os.environ["RUN_URL"],
+              "productionDeployment": False,
+          }
+
+          output = Path("team-site/dist/preview-evidence.json")
+          output.write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
+          PY
+
+      - name: Upload PR preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-preview-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
+          path: team-site/dist
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Publish preview summary
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          ARTIFACT_NAME: pr-preview-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          {
+            echo "## T11 PR Preview"
+            echo
+            echo "- Pull request: #${PR_NUMBER}"
+            echo "- Source commit: \`${PR_HEAD_SHA}\`"
+            echo "- Preview artifact: \`${ARTIFACT_NAME}\`"
+            echo "- Workflow run: [Open preview evidence](${RUN_URL})"
+            echo "- Production deployment triggered: no"
+          } >> "$GITHUB_STEP_SUMMARY"
