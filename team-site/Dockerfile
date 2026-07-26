@@ -8,5 +8,5 @@ RUN npm run build
 
 # Stage 2: Serve the static output using Nginx
 FROM nginx:alpine
-# Copy the built assets from the previous stage to Nginx's default public directory
+# Copy the built assets from the previous stage to Nginx's default public directorys
 COPY --from=build /app/dist /usr/share/nginx/html
