@@ -3,12 +3,16 @@ import {
   Bell,
   BookOpen,
   CalendarCheck,
+  CloudSun,
+  Droplets,
   GitBranch,
   GraduationCap,
   Search,
   ShieldCheck,
+  Wind,
   Users,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { CourseCard } from './components/CourseCard';
 import { DeadlineBoard } from './components/DeadlineBoard';
 import { StatCard } from './components/StatCard';
@@ -17,8 +21,55 @@ import { deadlineCards } from './data/deadlines';
 import { sprintStats } from './data/stats';
 import { getAverageProgress } from './utils/metrics';
 
+type WeatherResponse = {
+  ok: boolean;
+  provider: 'openweather';
+  city: string;
+  weather?: {
+    summary: string;
+    temperatureC: number;
+    feelsLikeC: number;
+    humidityPercent: number;
+    windSpeedMps: number;
+    observedAt: string;
+  };
+  error?: string;
+};
+
 export function App() {
   const averageProgress = getAverageProgress(courses);
+  const [weather, setWeather] = useState<WeatherResponse | null>(null);
+  const [weatherError, setWeatherError] = useState('');
+
+  useEffect(() => {
+    let active = true;
+
+    fetch('/api/weather/', { headers: { Accept: 'application/json' } })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Weather endpoint returned ${response.status}.`);
+        }
+
+        return (await response.json()) as WeatherResponse;
+      })
+      .then((payload) => {
+        if (!active) return;
+
+        if (!payload.ok || !payload.weather) {
+          setWeatherError(payload.error || 'Weather data is unavailable.');
+          return;
+        }
+
+        setWeather(payload);
+      })
+      .catch(() => {
+        if (active) setWeatherError('Weather data is unavailable.');
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <main className="shell">
@@ -45,6 +96,10 @@ export function App() {
           <a href="#deadlines">
             <CalendarCheck size={18} />
             Deadlines
+          </a>
+          <a href="#weather">
+            <CloudSun size={18} />
+            Weather
           </a>
           <a href="#teams">
             <Users size={18} />
@@ -94,6 +149,37 @@ export function App() {
           {sprintStats.map((stat) => (
             <StatCard key={stat.label} stat={stat} />
           ))}
+        </section>
+
+        <section className="weatherPanel" id="weather" aria-live="polite">
+          <div className="weatherHeading">
+            <div className="weatherIcon" aria-hidden="true">
+              <CloudSun size={28} />
+            </div>
+            <div>
+              <p className="eyebrow">OpenWeather</p>
+              <h2>Current weather in {weather?.city || 'Colombo'}</h2>
+            </div>
+          </div>
+
+          {!weather && !weatherError && <p>Loading current conditions...</p>}
+          {weatherError && <p className="weatherError">{weatherError}</p>}
+          {weather?.weather && (
+            <div className="weatherMetrics">
+              <div>
+                <strong>{Math.round(weather.weather.temperatureC)}°C</strong>
+                <span>{weather.weather.summary}</span>
+              </div>
+              <div>
+                <Droplets size={18} />
+                <span>{weather.weather.humidityPercent}% humidity</span>
+              </div>
+              <div>
+                <Wind size={18} />
+                <span>{weather.weather.windSpeedMps} m/s wind</span>
+              </div>
+            </div>
+          )}
         </section>
 
         <section className="contentGrid">
