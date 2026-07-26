@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Deploy Sprint Finale Submission
 
 Complete this file on `main` as tasks are completed. Do not paste secrets, private keys, token values, or screenshots that reveal credentials.
@@ -33,7 +32,7 @@ Use this section for short public notes and links. Full task instructions and ch
 | --- | --- | --- | --- |
 | T01 |  |  |  |
 | T02 |  |  |  |
-| T03 |  |  |  |
+| T03 |  | .github/workflows/ci.yml + .github/workflows/deploy.yml | CI uploads `site-dist-${{ github.sha }}` via `actions/upload-artifact@v4`; deploy downloads it via `actions/download-artifact@v4` with the source run-id and records `release-candidate/artifact-manifest.json`. No `npm run build` in the deploy job. |
 | T04 |  |  |  |
 | T05 |  |  |  |
 | T06 |  |  |  |
@@ -62,21 +61,24 @@ Use this section for short public notes and links. Full task instructions and ch
 | T29 |  |  |  |
 | T30 |  |  |  |
 
+## T03 Verification Note
+
+Implemented "Build Once Deploy Same Artifact" in `.github/workflows/`:
+
+**CI workflow (`ci.yml`):**
+- Builds `team-site/dist` with `npm run build`
+- Uploads the dist folder as artifact `site-dist-${{ github.sha }}` using `actions/upload-artifact@v4`
+
+**Deploy workflow (`deploy.yml`):**
+- Downloads the exact CI artifact using `actions/download-artifact@v4` with `name: site-dist-${{ github.sha }}` and `run-id` pointing to the CI run that produced it
+- Records artifact identity to `release-candidate/artifact-manifest.json` (`{"task":"T03","artifact":"site-dist-<sha>","sha":"<sha>","source_run_id":"<id>"}`)
+- Uploads `deploy-evidence-<sha>` artifact containing the manifest as evidence
+- Does **not** run `npm run build` — the same dist artifact from CI is reused
+
+Verified by inspecting both workflow files: only `ci.yml` runs the build, and `deploy.yml` consumes the artifact by name and source run ID.
+
 ## Public Notes
 
 List anything judges should know without exposing credentials or private infrastructure details.
-=======
-# T03 Verification Note
 
-Implemented in `.github/workflows/deploy.yml`:
-- Deploy request workflow now downloads the exact CI artifact `site-dist-${{ github.sha }}` using `actions/download-artifact@v4` with the source CI run ID.
-- Artifact identity is recorded to `release-candidate/artifact-manifest.json` before dispatch.
-- Deploy workflow does not run `npm run build`.
-
-Verification performed:
-- Confirmed CI workflow uploads `site-dist-${{ github.sha }}` from `team-site/dist`.
-- Confirmed deploy workflow consumes that artifact by name and source run ID, then uploads `deploy-evidence-${sha}` containing the manifest.
-
-
-
->>>>>>> f22144e ([T03] Build Once Deploy Same Artifact)
+<!-- AI-REVIEW-MARKER: participant must manually remove this marker -->
