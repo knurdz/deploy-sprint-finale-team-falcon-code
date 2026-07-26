@@ -1,0 +1,25 @@
+{
+  "task": "T02",
+  "team": "falcon-code",
+  "assignedDomain": "falcon-code.deploysprint-finals.knurdz.org",
+  "domain": {
+    "connected": true,
+    "hostname": "falcon-code.deploysprint-finals.knurdz.org",
+    "publicUrl": "https://falcon-code.deploysprint-finals.knurdz.org",
+    "recordType": "A",
+    "recordName": "falcon-code",
+    "recordTarget": "20.29.210.220",
+    "verificationRecordName": "_deploy-sprint-challenge.falcon-code"
+  },
+  "compatibility": {
+    "httpsDomainRequired": true,
+    "httpDomainRequired": true,
+    "rawIpHttpRequired": true,
+    "rawIpUrl": "http://20.29.210.220"
+  },
+  "evidence": {
+    "status": "domain.connected=true",
+    "ASSIGNED_DOMAIN": "falcon-code.deploysprint-finals.knurdz.org",
+    "dnsVerificationValue": "stored outside the repository"
+  }
+}

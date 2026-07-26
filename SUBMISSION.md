@@ -1,9 +1,23 @@
 # Deploy Sprint Finale Submission
 
+
 Complete this file on `main` as tasks are completed. Do not paste secrets, private keys, token values, or screenshots that reveal credentials.
 
 ## Team
 
+- Team name: Falcon_Code
+- Team members: Vibodha Lakshan, Imandi Perera, Vishwa Srinath, Ravindu Peiris
+- Live IP URL: http://20.29.210.220
+- Assigned domain URL: https://falcon-code.deploysprint-finals.knurdz.org
+- Repository URL: https://github.com/knurdz/deploy-sprint-finale-team-falcon-code
+
+## Release Evidence
+
+- Current production commit: 75d2b50f337e870773d3213fec6e4e0558b71326
+- Current artifact/image identifier: ghcr.io/falcon_code/deploy-sprint-finale-team-falcon-code:main
+- Current deployment workflow run: https://github.com/knurdz/deploy-sprint-finale-team-falcon-code/actions/runs/8679850186
+- Current release manifest path or URL: https://github.com/knurdz/deploy-sprint-finale-team-falcon-code/blob/main/.deploy/manifest/release.yaml
+- Notes on live evidence or fallback evidence: 2578c4ac082748468f5d88a6d23100d1
 - Team name:Falcon_Code
 - Team members:Vibodha Lakshan, Vishwa Shrinath, Imandi Perera, Ravindu Peiris
 - Live IP URL:http://20.29.210.220
@@ -15,7 +29,7 @@ Complete this file on `main` as tasks are completed. Do not paste secrets, priva
 - Current production commit:
 - Current artifact/image identifier:
 - Current deployment workflow run:
-- Current release manifest path or URL:
+- Current release manifest path or URL: https://falcon-code.deploysprint-finals.knurdz.org/domain-status.json
 - Notes on live evidence or fallback evidence:
 
 ## Score Summary
@@ -34,6 +48,9 @@ Use this section for short public notes and links. Full task instructions and ch
 | T02 |  |  |  |
 | T03 |  | .github/workflows/ci.yml + .github/workflows/deploy.yml | CI uploads `site-dist-${{ github.sha }}` via `actions/upload-artifact@v4`; deploy downloads it via `actions/download-artifact@v4` with the source run-id and records `release-candidate/artifact-manifest.json`. No `npm run build` in the deploy job. |
 | T04 |  |  |  |
+| T02 | [PR #2](https://github.com/knurdz/deploy-sprint-finale-team-falcon-code/pull/2) | [Domain](https://falcon-code.deploysprint-finals.knurdz.org) / [manifest](https://falcon-code.deploysprint-finals.knurdz.org/domain-status.json) | A record targets `20.29.210.220`; TXT verification was completed through the organizer DNS portal, and the value stays outside the repository. |
+| T03 |  |  |  |
+| T04 | <!-- Add PR link --> | <!-- Add diagnostic run link and successful rollback run link --> | Implemented manual rollback workflow (.github/workflows/rollback.yml) with release_ref input, verified commit SHA resolution, and organizer deployer API redispatch. |
 | T05 |  |  |  |
 | T06 |  |  |  |
 | T07 |  |  |  |
@@ -82,3 +99,13 @@ Verified by inspecting both workflow files: only `ci.yml` runs the build, and `d
 List anything judges should know without exposing credentials or private infrastructure details.
 
 <!-- AI-REVIEW-MARKER: participant must manually remove this marker -->
+### T02 verification
+
+- Assigned domain metadata: `ASSIGNED_DOMAIN=falcon-code.deploysprint-finals.knurdz.org`
+- Assigned A record: `falcon-code` -> `20.29.210.220`
+- TXT record name: `_deploy-sprint-challenge.falcon-code`
+- TXT verification: the record was created and validated through the organizer DNS portal; its value is stored only in the `DNS_TXT_VALUE` GitHub secret
+- Expected HTTPS evidence: `https://falcon-code.deploysprint-finals.knurdz.org`
+- Expected plain HTTP evidence: `http://falcon-code.deploysprint-finals.knurdz.org`
+- Expected raw-IP evidence: `http://20.29.210.220`
+- Public manifest: `https://falcon-code.deploysprint-finals.knurdz.org/domain-status.json`
