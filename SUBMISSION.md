@@ -51,7 +51,7 @@ Use this section for short public notes and links. Full task instructions and ch
 | T02 | [PR #2](https://github.com/knurdz/deploy-sprint-finale-team-falcon-code/pull/2) | [Domain](https://falcon-code.deploysprint-finals.knurdz.org) / [manifest](https://falcon-code.deploysprint-finals.knurdz.org/domain-status.json) | A record targets `20.29.210.220`; TXT verification was completed through the organizer DNS portal, and the value stays outside the repository. |
 | T03 |  |  |  |
 | T04 | <!-- Add PR link --> | <!-- Add diagnostic run link and successful rollback run link --> | Implemented manual rollback workflow (.github/workflows/rollback.yml) with release_ref input, verified commit SHA resolution, and organizer deployer API redispatch. |
-| T05 |  |  |  |
+| T05 |  | `/status` and `/runtime-config.json` | Runtime configuration is sourced from environment variables; the generated evidence exposes only configuration state and secret names, never secret values. |
 | T06 |  |  |  |
 | T07 |  |  |  |
 | T08 |  |  |  |
@@ -109,3 +109,11 @@ List anything judges should know without exposing credentials or private infrast
 - Expected plain HTTP evidence: `http://falcon-code.deploysprint-finals.knurdz.org`
 - Expected raw-IP evidence: `http://20.29.210.220`
 - Public manifest: `https://falcon-code.deploysprint-finals.knurdz.org/domain-status.json`
+
+### T05 verification
+
+- `PUBLIC_URL` is supplied to the build through GitHub repository variables.
+- Deployment credentials remain referenced as GitHub Secrets and are not passed to the site build.
+- `/status` includes redacted `runtimeConfig` evidence for T05.
+- `/runtime-config.json` reports whether public configuration exists and confirms `secretsRedacted=true`.
+- Local builds use the safe `not-configured` fallback instead of a committed infrastructure value.
