@@ -3,16 +3,20 @@ import {
   Bell,
   BookOpen,
   CalendarCheck,
+  CheckCircle2,
   CloudSun,
   Droplets,
   GitBranch,
   GraduationCap,
+  Mail,
+  MessageSquareText,
   Search,
   ShieldCheck,
   Wind,
   Users,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import type { FormEvent } from 'react';
 import { CourseCard } from './components/CourseCard';
 import { DeadlineBoard } from './components/DeadlineBoard';
 import { LearningVelocity } from './components/LearningVelocity';
@@ -37,10 +41,23 @@ type WeatherResponse = {
   error?: string;
 };
 
+type ContactConfig = {
+  task: 'T10';
+  provider: 'web3forms';
+  endpoint: string;
+  configured: boolean;
+  accessKey: string;
+};
+
+type ContactState = 'idle' | 'sending' | 'success' | 'error';
+
 export function App() {
   const averageProgress = getAverageProgress(courses);
   const [weather, setWeather] = useState<WeatherResponse | null>(null);
   const [weatherError, setWeatherError] = useState('');
+  const [contactConfig, setContactConfig] = useState<ContactConfig | null>(null);
+  const [contactState, setContactState] = useState<ContactState>('idle');
+  const [contactMessage, setContactMessage] = useState('');
 
   useEffect(() => {
     let active = true;
@@ -72,6 +89,79 @@ export function App() {
     };
   }, []);
 
+  useEffect(() => {
+    let active = true;
+
+    fetch('/contact-config.json', { headers: { Accept: 'application/json' } })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Contact configuration returned ${response.status}.`);
+        }
+
+        return (await response.json()) as ContactConfig;
+      })
+      .then((payload) => {
+        if (active) setContactConfig(payload);
+      })
+      .catch(() => {
+        if (!active) return;
+        setContactState('error');
+        setContactMessage('The contact service is currently unavailable.');
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const submitContactForm = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+
+    if (!contactConfig?.configured || !contactConfig.accessKey) {
+      setContactState('error');
+      setContactMessage('The contact service is not configured yet.');
+      return;
+    }
+
+    setContactState('sending');
+    setContactMessage('Sending your message...');
+
+    const fields = Object.fromEntries(new FormData(form));
+
+    try {
+      const response = await fetch(contactConfig.endpoint, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...fields,
+          access_key: contactConfig.accessKey,
+          subject: 'Falcon Code support request',
+          from_name: 'Falcon Code team website',
+        }),
+      });
+      const result = (await response.json()) as {
+        success?: boolean;
+        message?: string;
+      };
+
+      if (!response.ok || !result.success) {
+        throw new Error('Web3Forms rejected the submission.');
+      }
+
+      form.reset();
+      setContactState('success');
+      setContactMessage('Message sent successfully. We will be in touch.');
+    } catch {
+      setContactState('error');
+      setContactMessage('Unable to send your message. Please try again.');
+    }
+  };
+
+
   return (
     <main className="shell">
       <aside className="sidebar" aria-label="Primary">
@@ -101,6 +191,10 @@ export function App() {
           <a href="#weather">
             <CloudSun size={18} />
             Weather
+          </a>
+          <a href="#contact">
+            <Mail size={18} />
+            Contact
           </a>
           <a href="#teams">
             <Users size={18} />
@@ -182,6 +276,57 @@ export function App() {
               </div>
             </div>
           )}
+        </section>
+
+        <section className="contactPanel" id="contact">
+          <div className="contactIntro">
+            <div className="contactIcon" aria-hidden="true">
+              <MessageSquareText size={28} />
+            </div>
+            <div>
+              <p className="eyebrow">Web3Forms contact service</p>
+              <h2>Contact Team Falcon Code</h2>
+              <p>
+                Send a support request through our configured contact provider.
+              </p>
+            </div>
+          </div>
+
+          <form className="contactForm" onSubmit={submitContactForm}>
+            <input
+              className="botcheck"
+              type="checkbox"
+              name="botcheck"
+              tabIndex={-1}
+              autoComplete="off"
+            />
+            <label>
+              Name
+              <input name="name" required maxLength={100} />
+            </label>
+            <label>
+              Email
+              <input type="email" name="email" required maxLength={160} />
+            </label>
+            <label className="contactMessageField">
+              Message
+              <textarea name="message" required maxLength={2000} rows={5} />
+            </label>
+            <button type="submit" disabled={contactState === 'sending'}>
+              <Mail size={18} />
+              {contactState === 'sending' ? 'Sending...' : 'Send message'}
+            </button>
+            {contactMessage && (
+              <p
+                className={`contactResult ${contactState}`}
+                role="status"
+                aria-live="polite"
+              >
+                {contactState === 'success' && <CheckCircle2 size={18} />}
+                {contactMessage}
+              </p>
+            )}
+          </form>
         </section>
 
         <section className="contentGrid">

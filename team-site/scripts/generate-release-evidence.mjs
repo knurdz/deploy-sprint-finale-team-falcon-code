@@ -28,6 +28,7 @@ const runtimeConfig = {
     'DNS_PORTAL_USERNAME',
     'DNS_PORTAL_PASSWORD',
     'DNS_TXT_VALUE',
+    'WEB3FORMS_ACCESS_KEY',
   ],
 };
 
@@ -39,10 +40,20 @@ const weatherStatus = {
   keyExposed: false,
 };
 
+const contactProvider = {
+  task: 'T10',
+  provider: 'web3forms',
+  configured: Boolean(process.env.WEB3FORMS_ACCESS_KEY?.trim()),
+  endpoint: 'https://api.web3forms.com/submit',
+  accessKeyStoredInSecret: true,
+  accessKeyExposedInStatus: false,
+  targetEmailConfigured:
+    process.env.WEB3FORMS_TARGET_EMAIL === 'judges@knurdz.org',
+};
+
 const status = {
   ok: true,
-  tasks: ['T01', 'T07'],
-  tasks: ['T01', 'T05'],
+  tasks: ['T01', 'T05', 'T07', 'T10'],
   team: 'falcon-code',
   teamName: 'Falcon Code',
   repo:
@@ -52,10 +63,10 @@ const status = {
   releaseId,
   sourceRunId: releaseId,
   deployedAt,
-  publicUrl,
   weather: weatherStatus,
   publicUrl: publicUrl || 'not-configured',
   runtimeConfig,
+  contact: contactProvider,
 };
 
 await Promise.all([
@@ -79,5 +90,5 @@ await Promise.all([
 
 console.log(`Generated release evidence for ${commit}.`);
 console.log(
-  `Generated T01/T05 release evidence for ${commit}; public URL configured: ${runtimeConfig.publicUrlConfigured}.`,
+  `Generated T01/T05/T07/T10 release evidence for ${commit}; public URL configured: ${runtimeConfig.publicUrlConfigured}.`,
 );
