@@ -237,6 +237,7 @@ h3 {
 .panel,
 .courseCard,
 .weatherPanel,
+.insightsPanel,
 .contactPanel {
   border: 1px solid #ded7ca;
   border-radius: 8px;
@@ -258,6 +259,31 @@ h3 {
   align-items: center;
   gap: 6px;
   margin-bottom: 0;
+}
+
+.insightsPanel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px;
+  border-color: #33a58d;
+  background: #e8f6ef;
+}
+
+.insightsPanel p:last-child {
+  margin: 10px 0 0;
+  color: #526057;
+}
+
+.insightsPanel > span {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #16745f;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 800;
 }
 
 .weatherPanel {
@@ -600,11 +626,16 @@ h3 {
   .heroBand,
   .weatherPanel,
   .velocityBand,
+  .insightsPanel,
   .contactPanel {
     grid-template-columns: 1fr;
   }
 
   .weatherPanel {
+    display: grid;
+  }
+
+  .insightsPanel {
     display: grid;
   }
 

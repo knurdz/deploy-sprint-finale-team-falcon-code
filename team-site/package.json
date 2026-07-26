@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build && node scripts/generate-weather-evidence.mjs && node scripts/generate-contact-config.mjs && node scripts/generate-release-evidence.mjs",
+    "build": "tsc --noEmit && vite build && node scripts/generate-weather-evidence.mjs && node scripts/generate-contact-config.mjs && node scripts/generate-feature-flags.mjs && node scripts/generate-release-evidence.mjs",
     "preview": "vite preview",
     "lint": "tsc --noEmit"
   },

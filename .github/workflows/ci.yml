@@ -43,7 +43,8 @@ jobs:
 
       - name: Build
         env:
-          
+          # PR-AGENT-MARKER: participant must manually remove this marker
+          FEATURE_SHOW_INSIGHTS: ${{ secrets.FEATURE_SHOW_INSIGHTS }}
           OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
           OPENWEATHER_CITY: Colombo
           WEB3FORMS_ACCESS_KEY: ${{ secrets.WEB3FORMS_ACCESS_KEY }}
