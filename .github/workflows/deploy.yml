@@ -31,6 +31,10 @@ jobs:
     timeout-minutes: 5
 
     steps:
+      
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Resolve deploy request
         id: request
         env:
@@ -211,3 +215,21 @@ jobs:
             --data @payload.json
 
           echo "Requested organizer deployment for ${TEAM_REPO}@${TEAM_SHA}."
+
+      - name: Generate Resend deployment alert evidence
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RESEND_SEND_EMAIL: ${{ vars.RESEND_SEND_EMAIL || 'false' }}
+          RESEND_COMMIT: ${{ steps.request.outputs.sha }}
+          RESEND_EVIDENCE_PATH: release-candidate/resend-email-evidence.json
+        run: node team-site/scripts/send-resend-alert.mjs
+
+      - name: Record Resend alert summary
+        run: cat release-candidate/resend-email-evidence.json >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Resend alert evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: resend-email-evidence-${{ steps.request.outputs.sha }}
+          path: release-candidate/resend-email-evidence.json
+          if-no-files-found: error
