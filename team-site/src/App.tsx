@@ -52,6 +52,7 @@ type ContactConfig = {
 type ContactState = 'idle' | 'sending' | 'success' | 'error';
 
 export function App() {
+
   const averageProgress = getAverageProgress(courses);
   const [weather, setWeather] = useState<WeatherResponse | null>(null);
   const [weatherError, setWeatherError] = useState('');
