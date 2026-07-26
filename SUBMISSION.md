@@ -57,6 +57,8 @@ Use this section for short public notes and links. Full task instructions and ch
 | T08 | <!-- Add PR link --> | <!-- Add Evidence --> | Rebased organizer feature branch safely onto main. PR diff shows intended changes. |
 | T09 |  |  |  |
 | T10 |  |  |  |
+| T11 |  |  |  |
+| T12 |  | CI setup-node cache logs and workflow summary | npm dependency caching is keyed from `team-site/package-lock.json`; installation remains deterministic with `npm ci`. |
 | T11 |  | PR Preview workflow artifact and job summary | The PR-only workflow builds the exact PR head SHA and publishes `pr-preview-<pr-number>-<head-sha>` without triggering production deployment. |
 | T12 |  |  |  |
 | T13 |  |  |  |
@@ -138,4 +140,12 @@ List anything judges should know without exposing credentials or private infrast
 - Rebased and cherry-picked the organizer branch `task-assets/rebase-feature` safely onto `main`.
 - Ensured a clean git history without force pushing to `main`.
 - Integrated the `LearningVelocity.tsx` component into the app dashboard.
+
+### T12 verification
+
+- `.github/workflows/ci.yml` uses `actions/setup-node@v4` with Node 20 and `cache: npm`.
+- `cache-dependency-path` is exactly `team-site/package-lock.json`, so lockfile changes produce a different cache key.
+- Dependency installation remains `npm ci` inside `team-site/`; `npm install` is not used.
+- The CI job summary records the cache provider, lockfile path, deterministic install command, and scored commit SHA without exposing cache contents or secret values.
+- The setup-node step logs cache restore/save evidence for the successful workflow run.
 
