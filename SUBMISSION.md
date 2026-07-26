@@ -33,7 +33,7 @@ Use this section for short public notes and links. Full task instructions and ch
 | T01 |  |  |  |
 | T02 |  |  |  |
 | T03 |  |  |  |
-| T04 |  |  |  |
+| T04 | <!-- Add PR link --> | <!-- Add diagnostic run link and successful rollback run link --> | Implemented manual rollback workflow (.github/workflows/rollback.yml) with release_ref input, verified commit SHA resolution, and organizer deployer API redispatch. |
 | T05 |  |  |  |
 | T06 |  |  |  |
 | T07 |  |  |  |
