@@ -65,7 +65,7 @@ Use this section for short public notes and links. Full task instructions and ch
 | T14 |  |  |  |
 | T15 |  |  |  |
 | T16 |  |  |  |
-| T17 |  |  |  |
+| T17 |  | CI artifact `t17-health-gate-${{ github.sha }}` and workflow summary | Candidate is copied to an immutable release directory, checked through its private HTTP endpoint, and atomically selected only after `/health/` returns `ok`; failure leaves `current` unchanged. |
 | T18 |  |  |  |
 | T19 |  |  |  |
 | T20 |  |  |  |
@@ -148,4 +148,13 @@ List anything judges should know without exposing credentials or private infrast
 - Dependency installation remains `npm ci` inside `team-site/`; `npm install` is not used.
 - The CI job summary records the cache provider, lockfile path, deterministic install command, and scored commit SHA without exposing cache contents or secret values.
 - The setup-node step logs cache restore/save evidence for the successful workflow run.
+
+### T17 verification
+
+- `scripts/deploy-health-gated-release.sh` stages each candidate under `releases/<release-id>` while the `current` symlink continues serving the known-good release.
+- The script starts a candidate-only HTTP server and verifies `/health/` before atomically replacing the `current` symlink.
+- A failed candidate exits before the switch and logs the unchanged known-good target.
+- CI runs `scripts/test-health-gated-release.sh`, which proves both a successful switch and a failed-health preservation path.
+- The CI log is uploaded as `t17-health-gate-${{ github.sha }}` and copied into the workflow summary as fallback evidence tied to the scored commit.
+- The organizer dispatch requests the `health-gated-symlink` strategy without exposing or requiring participant-held VPS credentials.
 

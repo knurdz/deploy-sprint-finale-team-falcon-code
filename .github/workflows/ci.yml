@@ -18,6 +18,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Rehearse T17 health-gated release switch
+        run: |
+          set -euo pipefail
+          bash scripts/test-health-gated-release.sh 2>&1 | tee t17-release-rehearsal.log
+          {
+            echo "## T17 Health-Gated Release Rehearsal"
+            echo
+            echo '```text'
+            cat t17-release-rehearsal.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload T17 release rehearsal evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: t17-health-gate-${{ github.sha }}
+          path: t17-release-rehearsal.log
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Setup Node with lockfile cache
         uses: actions/setup-node@v4
         with:
