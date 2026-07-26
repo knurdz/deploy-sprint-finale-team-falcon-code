@@ -52,7 +52,7 @@ Use this section for short public notes and links. Full task instructions and ch
 | T03 |  |  |  |
 | T04 | <!-- Add PR link --> | <!-- Add diagnostic run link and successful rollback run link --> | Implemented manual rollback workflow (.github/workflows/rollback.yml) with release_ref input, verified commit SHA resolution, and organizer deployer API redispatch. |
 | T05 |  | `/status` and `/runtime-config.json` | Runtime configuration is sourced from environment variables; the generated evidence exposes only configuration state and secret names, never secret values. |
-| T06 |  |  |  |
+| T06 |  | CI artifact `site-dist-${{ github.sha }}` | CI runs for pull requests and pushes to `main`, installs from `team-site/package-lock.json`, builds `team-site/dist`, and fails if the expected artifact is missing. |
 | T07 |  |  |  |
 | T08 |  |  |  |
 | T09 |  |  |  |
@@ -117,3 +117,11 @@ List anything judges should know without exposing credentials or private infrast
 - `/status` includes redacted `runtimeConfig` evidence for T05.
 - `/runtime-config.json` reports whether public configuration exists and confirms `secretsRedacted=true`.
 - Local builds use the safe `not-configured` fallback instead of a committed infrastructure value.
+
+### T06 verification
+
+- `.github/workflows/ci.yml` runs on every pull request and push to `main`.
+- The build job uses Node 20 with npm caching keyed by `team-site/package-lock.json`.
+- Dependencies are installed with `npm ci` and the application is built with `npm run build`, both from `team-site/`.
+- `team-site/dist` is uploaded as `site-dist-${{ github.sha }}` and a missing artifact fails the job.
+- `.github/workflows/deploy.yml` is triggered by the completed `CI` workflow and only requests deployment after a successful main-branch build.
