@@ -15,9 +15,17 @@ const publicUrl =
   process.env.PUBLIC_URL ||
   'http://20.29.210.220';
 
+const weatherStatus = {
+  task: 'T07',
+  provider: 'openweather',
+  city: process.env.OPENWEATHER_CITY || 'Colombo',
+  endpoint: '/api/weather',
+  keyExposed: false,
+};
+
 const status = {
   ok: true,
-  tasks: ['T01'],
+  tasks: ['T01', 'T07'],
   team: 'falcon-code',
   teamName: 'Falcon Code',
   repo:
@@ -28,6 +36,7 @@ const status = {
   sourceRunId: releaseId,
   deployedAt,
   publicUrl,
+  weather: weatherStatus,
 };
 
 await Promise.all([
@@ -44,4 +53,4 @@ await Promise.all([
   ),
 ]);
 
-console.log(`Generated T01 release evidence for ${commit}.`);
+console.log(`Generated release evidence for ${commit}.`);
