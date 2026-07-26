@@ -61,11 +61,13 @@ Use this section for short public notes and links. Full task instructions and ch
 | T12 |  | CI setup-node cache logs and workflow summary | npm dependency caching is keyed from `team-site/package-lock.json`; installation remains deterministic with `npm ci`. |
 | T11 |  | PR Preview workflow artifact and job summary | The PR-only workflow builds the exact PR head SHA and publishes `pr-preview-<pr-number>-<head-sha>` without triggering production deployment. |
 | T12 |  |  |  |
+| T13 |  | `npm run build` and `npm run check:release-readiness` | Organizer feature bundle is integrated as a release-readiness panel with T13 provenance metadata and build-time validation. |
+| T14 |  |  |  |
 | T13 |  |  |  |
 | T14 |  |  |  |
 | T15 |  |  |  |
 | T16 |  |  |  |
-| T17 |  |  |  |
+| T17 |  | CI artifact `t17-health-gate-${{ github.sha }}` and workflow summary | Candidate is isolated in a temporary release directory, checked through its private HTTP endpoint, and published plus atomically selected only after `/health/` returns `ok`; failure leaves `current` unchanged and cleans staging for a safe retry. |
 | T18 |  |  |  |
 | T19 |  |  |  |
 | T20 |  |  |  |
@@ -141,6 +143,12 @@ List anything judges should know without exposing credentials or private infrast
 - Ensured a clean git history without force pushing to `main`.
 - Integrated the `LearningVelocity.tsx` component into the app dashboard.
 
+### T13 verification
+
+- The organizer `task-assets/feature-bundle` component, data, and validation script were adapted into `team-site/`.
+- The dashboard renders the release-readiness feature and labels it as T13.
+- `releaseReadinessTask` records the supplied bundle provenance and confirms the organizer marker was reviewed and removed.
+- The build runs `check:release-readiness`, which verifies the UI integration, expected readiness data, T13 metadata, and removal of the original bundle marker.
 ### T12 verification
 
 - `.github/workflows/ci.yml` uses `actions/setup-node@v4` with Node 20 and `cache: npm`.
@@ -148,4 +156,14 @@ List anything judges should know without exposing credentials or private infrast
 - Dependency installation remains `npm ci` inside `team-site/`; `npm install` is not used.
 - The CI job summary records the cache provider, lockfile path, deterministic install command, and scored commit SHA without exposing cache contents or secret values.
 - The setup-node step logs cache restore/save evidence for the successful workflow run.
+
+### T17 verification
+
+- `scripts/deploy-health-gated-release.sh` stages each candidate under `releases/<release-id>` while the `current` symlink continues serving the known-good release.
+- The script starts a candidate-only HTTP server and verifies `/health/` before atomically replacing the `current` symlink.
+- A failed candidate exits before the switch and logs the unchanged known-good target.
+- Failed candidate staging is removed without publishing a release, allowing the same release ID to be retried after the health issue is fixed.
+- CI runs `scripts/test-health-gated-release.sh`, which proves both a successful switch and a failed-health preservation path.
+- The CI log is uploaded as `t17-health-gate-${{ github.sha }}` and copied into the workflow summary as fallback evidence tied to the scored commit.
+- The organizer dispatch requests the `health-gated-symlink` strategy without exposing or requiring participant-held VPS credentials.
 
