@@ -1,0 +1,10 @@
+# docker-compose.yml
+services:
+  team-site:
+    image: deploy-sprint/team-site:${APP_VERSION}
+    container_name: ${COMPOSE_PROJECT_NAME}
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT}:80"
+    env_file:
+      - .env
