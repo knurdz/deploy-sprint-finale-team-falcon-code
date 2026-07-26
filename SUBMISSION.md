@@ -54,7 +54,7 @@ Use this section for short public notes and links. Full task instructions and ch
 | T05 |  | `/status` and `/runtime-config.json` | Runtime configuration is sourced from environment variables; the generated evidence exposes only configuration state and secret names, never secret values. |
 | T06 |  | CI artifact `site-dist-${{ github.sha }}` | CI runs for pull requests and pushes to `main`, installs from `team-site/package-lock.json`, builds `team-site/dist`, and fails if the expected artifact is missing. |
 | T07 |  |  |  |
-| T08 |  |  |  |
+| T08 | <!-- Add PR link --> | <!-- Add Evidence --> | Rebased organizer feature branch safely onto main. PR diff shows intended changes. |
 | T09 |  |  |  |
 | T10 |  |  |  |
 | T11 |  |  |  |
@@ -125,3 +125,9 @@ List anything judges should know without exposing credentials or private infrast
 - Dependencies are installed with `npm ci` and the application is built with `npm run build`, both from `team-site/`.
 - `team-site/dist` is uploaded as `site-dist-${{ github.sha }}` and a missing artifact fails the job.
 - `.github/workflows/deploy.yml` is triggered by the completed `CI` workflow and only requests deployment after a successful main-branch build.
+### T08 verification
+
+- Rebased and cherry-picked the organizer branch `task-assets/rebase-feature` safely onto `main`.
+- Ensured a clean git history without force pushing to `main`.
+- Integrated the `LearningVelocity.tsx` component into the app dashboard.
+
