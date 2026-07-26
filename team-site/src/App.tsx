@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react';
 import { CourseCard } from './components/CourseCard';
 import { DeadlineBoard } from './components/DeadlineBoard';
 import { LearningVelocity } from './components/LearningVelocity';
+import { ReleaseReadiness } from './components/ReleaseReadiness';
 import { StatCard } from './components/StatCard';
 import { courses } from './data/courses';
 import { deadlineCards } from './data/deadlines';
@@ -98,6 +99,10 @@ export function App() {
             <CalendarCheck size={18} />
             Deadlines
           </a>
+          <a href="#release-readiness">
+            <ShieldCheck size={18} />
+            Release readiness
+          </a>
           <a href="#weather">
             <CloudSun size={18} />
             Weather
@@ -152,7 +157,9 @@ export function App() {
           ))}
         </section>
 
+
         <LearningVelocity courses={courses} />
+        <ReleaseReadiness />
         <section className="weatherPanel" id="weather" aria-live="polite">
           <div className="weatherHeading">
             <div className="weatherIcon" aria-hidden="true">

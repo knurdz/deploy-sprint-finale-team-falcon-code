@@ -59,7 +59,7 @@ Use this section for short public notes and links. Full task instructions and ch
 | T10 |  |  |  |
 | T11 |  | PR Preview workflow artifact and job summary | The PR-only workflow builds the exact PR head SHA and publishes `pr-preview-<pr-number>-<head-sha>` without triggering production deployment. |
 | T12 |  |  |  |
-| T13 |  |  |  |
+| T13 |  | `npm run build` and `npm run check:release-readiness` | Organizer feature bundle is integrated as a release-readiness panel with T13 provenance metadata and build-time validation. |
 | T14 |  |  |  |
 | T15 |  |  |  |
 | T16 |  |  |  |
@@ -138,4 +138,11 @@ List anything judges should know without exposing credentials or private infrast
 - Rebased and cherry-picked the organizer branch `task-assets/rebase-feature` safely onto `main`.
 - Ensured a clean git history without force pushing to `main`.
 - Integrated the `LearningVelocity.tsx` component into the app dashboard.
+
+### T13 verification
+
+- The organizer `task-assets/feature-bundle` component, data, and validation script were adapted into `team-site/`.
+- The dashboard renders the release-readiness feature and labels it as T13.
+- `releaseReadinessTask` records the supplied bundle provenance and confirms the organizer marker was reviewed and removed.
+- The build runs `check:release-readiness`, which verifies the UI integration, expected readiness data, T13 metadata, and removal of the original bundle marker.
 
