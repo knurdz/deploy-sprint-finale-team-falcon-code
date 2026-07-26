@@ -62,7 +62,7 @@ Use this section for short public notes and links. Full task instructions and ch
 | T11 |  | PR Preview workflow artifact and job summary | The PR-only workflow builds the exact PR head SHA and publishes `pr-preview-<pr-number>-<head-sha>` without triggering production deployment. |
 | T12 |  |  |  |
 | T13 |  |  |  |
-| T14 |  |  |  |
+| T14 | | Dockerfile and successful build log | The multi-stage Dockerfile builds the Vite app and uses an Nginx runtime stage to serve the static output, tagged as deploy-sprint/falcon-code:${{ github.sha }}. |
 | T15 |  |  |  |
 | T16 |  |  |  |
 | T17 |  |  |  |
