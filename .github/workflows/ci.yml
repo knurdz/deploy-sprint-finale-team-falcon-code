@@ -63,7 +63,8 @@ jobs:
 
       - name: Build
         env:
-          
+        
+          FEATURE_SHOW_INSIGHTS: ${{ secrets.FEATURE_FLAG_NAME }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
           OPENWEATHER_CITY: Colombo
