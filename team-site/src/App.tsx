@@ -38,6 +38,7 @@ type WeatherResponse = {
 };
 
 export function App() {
+
   const averageProgress = getAverageProgress(courses);
   const [weather, setWeather] = useState<WeatherResponse | null>(null);
   const [weatherError, setWeatherError] = useState('');
