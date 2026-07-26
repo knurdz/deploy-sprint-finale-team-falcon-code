@@ -57,7 +57,7 @@ Use this section for short public notes and links. Full task instructions and ch
 | T08 | <!-- Add PR link --> | <!-- Add Evidence --> | Rebased organizer feature branch safely onto main. PR diff shows intended changes. |
 | T09 |  |  |  |
 | T10 |  |  |  |
-| T11 |  |  |  |
+| T11 |  | PR Preview workflow artifact and job summary | The PR-only workflow builds the exact PR head SHA and publishes `pr-preview-<pr-number>-<head-sha>` without triggering production deployment. |
 | T12 |  |  |  |
 | T13 |  |  |  |
 | T14 |  |  |  |
@@ -97,6 +97,14 @@ Verified by inspecting both workflow files: only `ci.yml` runs the build, and `d
 ## Public Notes
 
 List anything judges should know without exposing credentials or private infrastructure details.
+
+### T11 verification
+
+- `.github/workflows/pr-preview.yml` runs only for pull-request events.
+- The workflow checks out `github.event.pull_request.head.sha`, so evidence maps to the submitted PR commit rather than an unrelated merge SHA.
+- The preview build installs from `team-site/package-lock.json`, builds `team-site/dist`, and uploads a SHA-bound preview artifact.
+- `preview-evidence.json` and the workflow summary record the PR number, head commit, artifact name, and workflow-run URL.
+- The preview workflow has read-only permissions and contains no production deployment step or secret reference.
 
 
 ### T02 verification
