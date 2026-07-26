@@ -118,6 +118,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+     
+      - name: Validate T22 Compose configuration
+        run: |
+          set -euo pipefail
+          mkdir -p compose-evidence
+          cp .env.example .env
+          docker compose --env-file .env config --quiet
+          docker compose --env-file .env config \
+            > compose-evidence/compose-config.yml
+          printf '{"task":"T22","commit":"%s","service":"team-site","compose_valid":true,"env_template":".env.example","placeholders_only":true}\n' \
+            "$GITHUB_SHA" \
+            > compose-evidence/compose-manifest.json
+
       - name: Build commit-tagged container image
         env:
           PUBLIC_URL: ${{ vars.PUBLIC_URL || vars.DOMAIN_PUBLIC_URL || vars.IP_PUBLIC_URL }}
@@ -131,6 +144,59 @@ jobs:
             --tag "$IMAGE_TAG" \
             team-site \
             2>&1 | tee container-evidence/docker-build.log
+
+      - name: Run and verify T22 Compose service
+        env:
+          APP_VERSION: ${{ github.sha }}
+          APP_PORT: "18081"
+          PUBLIC_URL: ${{ vars.PUBLIC_URL || vars.DOMAIN_PUBLIC_URL || vars.IP_PUBLIC_URL || 'not-configured' }}
+        run: |
+          set -euo pipefail
+
+          cleanup() {
+            docker compose --env-file .env logs \
+              > compose-evidence/compose-container.log 2>&1 || true
+            docker compose --env-file .env down \
+              --remove-orphans >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+
+          docker compose --env-file .env up --detach --no-build
+
+          health_url="http://127.0.0.1:${APP_PORT}/health/"
+          for attempt in {1..20}; do
+            if health_body="$(curl --fail --silent --show-error "$health_url")"; then
+              break
+            fi
+            if [ "$attempt" -eq 20 ]; then
+              echo "T22 Compose service did not become healthy."
+              docker compose --env-file .env logs
+              exit 1
+            fi
+            sleep 1
+          done
+
+          test "$health_body" = "ok"
+          docker compose --env-file .env ps \
+            > compose-evidence/compose-ps.txt
+
+          {
+            echo "## T22 Compose Runtime Evidence"
+            echo
+            echo "- Commit: \`${GITHUB_SHA}\`"
+            echo "- Service: \`team-site\`"
+            echo "- Compose config: valid"
+            echo "- Runtime health: passed"
+            echo "- Environment template: placeholders only"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload T22 Compose evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: compose-runtime-${{ github.sha }}
+          path: compose-evidence
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Run container and verify health
         run: |
