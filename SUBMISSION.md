@@ -71,7 +71,7 @@ Use this section for short public notes and links. Full task instructions and ch
 | T18 |  | CI artifact `container-image-${{ github.sha }}`, container manifest/logs, and organizer deploy request | Actions builds the commit-tagged Docker image, verifies `/health/` and `/status/`, then submits its artifact, image identity, and `APP_PORT` through the approved organizer deployer without SSH credentials. |
 | T19 |  |  |  |
 | T20 |  |  |  |
-| T21 |  |  |  |
+| T21 |  | CI artifact `t21-workflow-safety-${{ github.sha }}` and workflow summary | Production deploys and rollbacks share a queued concurrency lock, dashboard deploys queue separately, and workflow permissions are explicit. |
 | T22 |  |  |  |
 | T23 |  |  |  |
 | T24 |  |  |  |
@@ -174,4 +174,12 @@ List anything judges should know without exposing credentials or private infrast
 - CI records the image ID, container ID, port, and health result in `container-manifest.json`, captures container logs, and uploads the saved image as `container-image-${{ github.sha }}`.
 - The deploy workflow downloads that exact artifact from the successful source run and passes its identity plus `APP_PORT` to the organizer-controlled deployer.
 - No participant-visible SSH key, Docker registry password, or direct VPS upload is used.
+
+### T21 verification
+
+- `.github/workflows/deploy.yml` declares read-only contents/actions permissions and queues duplicate production requests with `cancel-in-progress: false`.
+- `.github/workflows/rollback.yml` uses the same production concurrency group, preventing rollback and normal deployment requests from racing.
+- `.github/workflows/pages.yml` has an independent queued dashboard deployment group.
+- CI scans every workflow for the prohibited privileged PR trigger and validates the required permission and concurrency blocks.
+- The source-scan output is uploaded as `t21-workflow-safety-${{ github.sha }}` and included in the workflow summary.
 

@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.repository }}-production-deploy
+  cancel-in-progress: false
+
 jobs:
   rollback:
     name: Redeploy known-good release
