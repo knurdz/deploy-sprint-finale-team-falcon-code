@@ -59,6 +59,8 @@ jobs:
             echo "sha=$sha"
             echo "branch=$branch"
             echo "artifact_name=site-dist-$sha"
+            echo "container_artifact_name=container-image-$sha"
+            echo "image_tag=deploy-sprint/team-site:$sha"
           } >> "$GITHUB_OUTPUT"
 
       - name: Resolve manual CI artifact source
@@ -151,13 +153,23 @@ jobs:
           run-id: ${{ steps.source.outputs.source_run_id }}
           github-token: ${{ github.token }}
 
+      - name: Download verified T18 container artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ steps.request.outputs.container_artifact_name }}
+          path: ./release-candidate/container
+          run-id: ${{ steps.source.outputs.source_run_id }}
+          github-token: ${{ github.token }}
+
       - name: Record artifact identity
         run: |
           set -euo pipefail
 
           mkdir -p release-candidate
-          printf '{"tasks":["T03","T17"],"artifact":"%s","sha":"%s","source_run_id":"%s","deployment_strategy":"health-gated-symlink","health_path":"/health/","release_script":"scripts/deploy-health-gated-release.sh"}\n' \
+          printf '{"tasks":["T03","T17","T18"],"artifact":"%s","container_artifact":"%s","image":"%s","sha":"%s","source_run_id":"%s","deployment_strategy":"health-gated-container","health_path":"/health/","container_port":8080}\n' \
             "${{ steps.request.outputs.artifact_name }}" \
+            "${{ steps.request.outputs.container_artifact_name }}" \
+            "${{ steps.request.outputs.image_tag }}" \
             "${{ steps.request.outputs.sha }}" \
             "${{ steps.source.outputs.source_run_id }}" \
             > release-candidate/artifact-manifest.json
@@ -166,7 +178,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: deploy-evidence-${{ steps.request.outputs.sha }}
-          path: release-candidate/artifact-manifest.json
+          path: |
+            release-candidate/artifact-manifest.json
+            release-candidate/container/container-manifest.json
+            release-candidate/container/container.log
 
       - name: Request deploy from organizer deployer
         env:
@@ -176,6 +191,9 @@ jobs:
           TEAM_SHA: ${{ steps.request.outputs.sha }}
           TEAM_BRANCH: ${{ steps.request.outputs.branch }}
           SOURCE_RUN_ID: ${{ steps.source.outputs.source_run_id }}
+          CONTAINER_ARTIFACT: ${{ steps.request.outputs.container_artifact_name }}
+          CONTAINER_IMAGE: ${{ steps.request.outputs.image_tag }}
+          APP_PORT: ${{ vars.APP_PORT || '8080' }}
         run: |
           set -euo pipefail
 
@@ -196,9 +214,13 @@ jobs:
                   "sha": os.environ["TEAM_SHA"],
                   "branch": os.environ["TEAM_BRANCH"],
                   "source_run_id": os.environ["SOURCE_RUN_ID"],
-                  "deployment_strategy": "health-gated-symlink",
+                  "deployment_strategy": "health-gated-container",
                   "health_path": "/health/",
                   "release_script": "scripts/deploy-health-gated-release.sh",
+                  "container_artifact": os.environ["CONTAINER_ARTIFACT"],
+                  "container_image": os.environ["CONTAINER_IMAGE"],
+                  "container_port": "8080",
+                  "app_port": os.environ["APP_PORT"],
               },
           }
 
