@@ -68,7 +68,7 @@ Use this section for short public notes and links. Full task instructions and ch
 | T15 |  |  |  |
 | T16 |  |  |  |
 | T17 |  | CI artifact `t17-health-gate-${{ github.sha }}` and workflow summary | Candidate is isolated in a temporary release directory, checked through its private HTTP endpoint, and published plus atomically selected only after `/health/` returns `ok`; failure leaves `current` unchanged and cleans staging for a safe retry. |
-| T18 |  |  |  |
+| T18 |  | CI artifact `container-image-${{ github.sha }}`, container manifest/logs, and organizer deploy request | Actions builds the commit-tagged Docker image, verifies `/health/` and `/status/`, then submits its artifact, image identity, and `APP_PORT` through the approved organizer deployer without SSH credentials. |
 | T19 |  |  |  |
 | T20 |  |  |  |
 | T21 |  |  |  |
@@ -166,4 +166,12 @@ List anything judges should know without exposing credentials or private infrast
 - CI runs `scripts/test-health-gated-release.sh`, which proves both a successful switch and a failed-health preservation path.
 - The CI log is uploaded as `t17-health-gate-${{ github.sha }}` and copied into the workflow summary as fallback evidence tied to the scored commit.
 - The organizer dispatch requests the `health-gated-symlink` strategy without exposing or requiring participant-held VPS credentials.
+
+### T18 verification
+
+- `team-site/Dockerfile` builds the Vite site with Node 20 and serves the immutable output from an unprivileged Nginx port inside the container.
+- The CI container job tags the image as `deploy-sprint/team-site:<commit-sha>`, starts it on a loopback-only test port, verifies `/health/`, and confirms `/status/` contains the scored commit.
+- CI records the image ID, container ID, port, and health result in `container-manifest.json`, captures container logs, and uploads the saved image as `container-image-${{ github.sha }}`.
+- The deploy workflow downloads that exact artifact from the successful source run and passes its identity plus `APP_PORT` to the organizer-controlled deployer.
+- No participant-visible SSH key, Docker registry password, or direct VPS upload is used.
 

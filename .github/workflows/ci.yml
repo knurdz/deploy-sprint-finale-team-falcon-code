@@ -1,5 +1,6 @@
 name: CI
 
+
 on:
   pull_request:
   push:
@@ -79,5 +80,115 @@ jobs:
         with:
           name: site-dist-${{ github.sha }}
           path: team-site/dist
+          if-no-files-found: error
+          retention-days: 7
+
+  container:
+    name: Build and verify T18 container
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      IMAGE_TAG: deploy-sprint/team-site:${{ github.sha }}
+      CONTAINER_NAME: t18-team-site
+      TEST_PORT: "18080"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build commit-tagged container image
+        env:
+          PUBLIC_URL: ${{ vars.PUBLIC_URL || vars.DOMAIN_PUBLIC_URL || vars.IP_PUBLIC_URL }}
+        run: |
+          set -euo pipefail
+          mkdir -p container-evidence
+          docker build \
+            --build-arg "COMMIT_SHA=${GITHUB_SHA}" \
+            --build-arg "RELEASE_ID=${GITHUB_RUN_ID}" \
+            --build-arg "PUBLIC_URL=${PUBLIC_URL:-not-configured}" \
+            --tag "$IMAGE_TAG" \
+            team-site \
+            2>&1 | tee container-evidence/docker-build.log
+
+      - name: Run container and verify health
+        run: |
+          set -euo pipefail
+
+          container_id="$(
+            docker run --detach \
+              --name "$CONTAINER_NAME" \
+              --publish "127.0.0.1:${TEST_PORT}:8080" \
+              "$IMAGE_TAG"
+          )"
+
+          cleanup() {
+            docker logs "$CONTAINER_NAME" > container-evidence/container.log 2>&1 || true
+            docker rm --force "$CONTAINER_NAME" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+
+          health_url="http://127.0.0.1:${TEST_PORT}/health/"
+          for attempt in {1..20}; do
+            if health_body="$(curl --fail --silent --show-error "$health_url")"; then
+              break
+            fi
+            if [ "$attempt" -eq 20 ]; then
+              echo "T18 container did not become healthy."
+              docker logs "$CONTAINER_NAME"
+              exit 1
+            fi
+            sleep 1
+          done
+
+          if [ "$health_body" != "ok" ]; then
+            echo "T18 unexpected health response: $health_body"
+            exit 1
+          fi
+
+          curl --fail --silent --show-error \
+            "http://127.0.0.1:${TEST_PORT}/status/" \
+            > container-evidence/status.json
+
+          grep --fixed-strings --quiet "$GITHUB_SHA" container-evidence/status.json
+
+          image_id="$(docker image inspect --format '{{.Id}}' "$IMAGE_TAG")"
+          export CONTAINER_ID="$container_id" IMAGE_ID="$image_id"
+          python3 - <<'PY' > container-evidence/container-manifest.json
+          import json
+          import os
+
+          print(json.dumps({
+              "task": "T18",
+              "commit": os.environ["GITHUB_SHA"],
+              "image": os.environ["IMAGE_TAG"],
+              "image_id": os.environ["IMAGE_ID"],
+              "container_id": os.environ["CONTAINER_ID"],
+              "container_port": 8080,
+              "health_path": "/health/",
+              "health": "passed",
+          }, indent=2))
+          PY
+
+          {
+            echo "## T18 Container Evidence"
+            echo
+            echo "- Commit: \`${GITHUB_SHA}\`"
+            echo "- Image: \`${IMAGE_TAG}\`"
+            echo "- Image ID: \`${image_id}\`"
+            echo "- Container port: \`8080\`"
+            echo "- Candidate health: passed before deploy request"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Save immutable container image
+        run: |
+          set -euo pipefail
+          docker save "$IMAGE_TAG" | gzip -9 > container-evidence/team-site-image.tar.gz
+
+      - name: Upload T18 container evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: container-image-${{ github.sha }}
+          path: container-evidence
           if-no-files-found: error
           retention-days: 7
