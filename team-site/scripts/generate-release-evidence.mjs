@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+import { featureFlags } from './feature-flags.mjs';
 
 const distDirectory = path.resolve(process.cwd(), 'dist');
 const healthDirectory = path.join(distDirectory, 'health');
@@ -51,9 +52,11 @@ const contactProvider = {
     process.env.WEB3FORMS_TARGET_EMAIL === 'judges@knurdz.org',
 };
 
+const flags = featureFlags();
+
 const status = {
   ok: true,
-  tasks: ['T01', 'T05', 'T07', 'T10'],
+  tasks: ['T01', 'T05', 'T07', 'T10', 'T15'],
   team: 'falcon-code',
   teamName: 'Falcon Code',
   repo:
@@ -67,6 +70,7 @@ const status = {
   publicUrl: publicUrl || 'not-configured',
   runtimeConfig,
   contact: contactProvider,
+  featureFlags: flags,
 };
 
 await Promise.all([
@@ -90,5 +94,5 @@ await Promise.all([
 
 console.log(`Generated release evidence for ${commit}.`);
 console.log(
-  `Generated T01/T05/T07/T10 release evidence for ${commit}; public URL configured: ${runtimeConfig.publicUrlConfigured}.`,
+  `Generated T01/T05/T07/T10/T15 release evidence for ${commit}; public URL configured: ${runtimeConfig.publicUrlConfigured}.`,
 );
