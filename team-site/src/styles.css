@@ -20,7 +20,8 @@ body {
 }
 
 button,
-input {
+input,
+textarea {
   font: inherit;
 }
 
@@ -235,7 +236,8 @@ h3 {
 .statCard,
 .panel,
 .courseCard,
-.weatherPanel {
+.weatherPanel,
+.contactPanel {
   border: 1px solid #ded7ca;
   border-radius: 8px;
   background: #fffaf2;
@@ -317,6 +319,126 @@ h3 {
 
 .weatherMetrics > div:first-child span {
   text-transform: capitalize;
+}
+
+.contactPanel {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.8fr) minmax(320px, 1.2fr);
+  gap: 28px;
+  padding: 24px;
+}
+
+.contactIntro,
+.contactForm label,
+.contactResult,
+.contactForm button {
+  display: flex;
+}
+
+.contactIntro {
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.contactIntro p:last-child {
+  margin: 12px 0 0;
+  color: #526057;
+  line-height: 1.6;
+}
+
+.contactIcon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: #d9f275;
+}
+
+.contactForm {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.contactForm label {
+  flex-direction: column;
+  gap: 7px;
+  color: #526057;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.contactForm input,
+.contactForm textarea {
+  width: 100%;
+  border: 1px solid #d9d1c2;
+  border-radius: 8px;
+  outline: 0;
+  background: #fff;
+  color: #17201b;
+}
+
+.contactForm input {
+  min-height: 44px;
+  padding: 0 12px;
+}
+
+.contactForm textarea {
+  padding: 12px;
+  resize: vertical;
+}
+
+.contactForm input:focus,
+.contactForm textarea:focus {
+  border-color: #33a58d;
+  box-shadow: 0 0 0 3px rgba(51, 165, 141, 0.15);
+}
+
+.contactMessageField,
+.contactForm button,
+.contactResult {
+  grid-column: 1 / -1;
+}
+
+.contactForm button {
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  border-radius: 8px;
+  background: #17201b;
+  color: #f7f3eb;
+  font-weight: 800;
+}
+
+.contactForm button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.contactResult {
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0;
+  color: #526057;
+}
+
+.contactResult.success {
+  color: #16745f;
+}
+
+.contactResult.error {
+  color: #a43b2f;
+}
+
+.botcheck {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
 }
 
 .statCard.teal {
@@ -524,7 +646,9 @@ h3 {
   .shell,
   .contentGrid,
   .heroBand,
-  .velocityBand {
+  .weatherPanel,
+  .velocityBand,
+  .contactPanel {
     grid-template-columns: 1fr;
   }
 
@@ -556,7 +680,8 @@ h3 {
 
   .topbar,
   .statGrid,
-  .courseFooter {
+  .courseFooter,
+  .contactForm {
     grid-template-columns: 1fr;
   }
 
@@ -567,5 +692,11 @@ h3 {
 
   .deadline {
     white-space: normal;
+  }
+
+  .contactForm label,
+  .contactForm button,
+  .contactResult {
+    grid-column: 1;
   }
 }

@@ -18,12 +18,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node with lockfile cache
         uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: npm
           cache-dependency-path: team-site/package-lock.json
+
+      - name: Record dependency cache evidence
+        run: |
+          {
+            echo "## T12 Dependency Cache"
+            echo
+            echo "- Cache provider: \`actions/setup-node@v4\`"
+            echo "- Package manager: \`npm\`"
+            echo "- Cache dependency path: \`team-site/package-lock.json\`"
+            echo "- Deterministic install: \`npm ci\`"
+            echo "- Source commit: \`${GITHUB_SHA}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Install dependencies
         run: npm ci
@@ -31,8 +43,11 @@ jobs:
 
       - name: Build
         env:
+          
           OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
           OPENWEATHER_CITY: Colombo
+          WEB3FORMS_ACCESS_KEY: ${{ secrets.WEB3FORMS_ACCESS_KEY }}
+          WEB3FORMS_TARGET_EMAIL: judges@knurdz.org
           VITE_PUBLIC_URL: ${{ vars.PUBLIC_URL || vars.DOMAIN_PUBLIC_URL || secrets.PUBLIC_URL || vars.IP_PUBLIC_URL }}
           PUBLIC_URL: ${{ vars.PUBLIC_URL || vars.DOMAIN_PUBLIC_URL || vars.IP_PUBLIC_URL }}
         run: npm run build
