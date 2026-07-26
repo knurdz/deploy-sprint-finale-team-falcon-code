@@ -234,7 +234,8 @@ h3 {
 
 .statCard,
 .panel,
-.courseCard {
+.courseCard,
+.weatherPanel {
   border: 1px solid #ded7ca;
   border-radius: 8px;
   background: #fffaf2;
@@ -255,6 +256,67 @@ h3 {
   align-items: center;
   gap: 6px;
   margin-bottom: 0;
+}
+
+.weatherPanel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px;
+}
+
+.weatherHeading,
+.weatherMetrics,
+.weatherMetrics > div {
+  display: flex;
+  align-items: center;
+}
+
+.weatherHeading {
+  gap: 12px;
+}
+
+.weatherHeading h2,
+.weatherPanel p {
+  margin-bottom: 0;
+}
+
+.weatherIcon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: #d9f275;
+}
+
+.weatherMetrics {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 18px;
+}
+
+.weatherMetrics > div {
+  gap: 7px;
+}
+
+.weatherMetrics > div:first-child {
+  display: grid;
+  gap: 2px;
+}
+
+.weatherMetrics strong {
+  font-size: 2rem;
+}
+
+.weatherMetrics span,
+.weatherError {
+  color: #526057;
+}
+
+.weatherMetrics > div:first-child span {
+  text-transform: capitalize;
 }
 
 .statCard.teal {
@@ -415,7 +477,16 @@ h3 {
   .contentGrid,
   .heroBand,
   .velocityBand {
+  .weatherPanel {
     grid-template-columns: 1fr;
+  }
+
+  .weatherPanel {
+    display: grid;
+  }
+
+  .weatherMetrics {
+    justify-content: flex-start;
   }
 
   .sidebar {

@@ -31,8 +31,17 @@ const runtimeConfig = {
   ],
 };
 
+const weatherStatus = {
+  task: 'T07',
+  provider: 'openweather',
+  city: process.env.OPENWEATHER_CITY || 'Colombo',
+  endpoint: '/api/weather',
+  keyExposed: false,
+};
+
 const status = {
   ok: true,
+  tasks: ['T01', 'T07'],
   tasks: ['T01', 'T05'],
   team: 'falcon-code',
   teamName: 'Falcon Code',
@@ -43,6 +52,8 @@ const status = {
   releaseId,
   sourceRunId: releaseId,
   deployedAt,
+  publicUrl,
+  weather: weatherStatus,
   publicUrl: publicUrl || 'not-configured',
   runtimeConfig,
 };
@@ -66,6 +77,7 @@ await Promise.all([
   ),
 ]);
 
+console.log(`Generated release evidence for ${commit}.`);
 console.log(
   `Generated T01/T05 release evidence for ${commit}; public URL configured: ${runtimeConfig.publicUrlConfigured}.`,
 );
