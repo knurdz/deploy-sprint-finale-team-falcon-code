@@ -45,6 +45,9 @@ Use this section for short public notes and links. Full task instructions and ch
 | Task | PR | Evidence | Notes |
 | --- | --- | --- | --- |
 | T01 |  |  |  |
+| T02 |  |  |  |
+| T03 |  | .github/workflows/ci.yml + .github/workflows/deploy.yml | CI uploads `site-dist-${{ github.sha }}` via `actions/upload-artifact@v4`; deploy downloads it via `actions/download-artifact@v4` with the source run-id and records `release-candidate/artifact-manifest.json`. No `npm run build` in the deploy job. |
+| T04 |  |  |  |
 | T02 | [PR #2](https://github.com/knurdz/deploy-sprint-finale-team-falcon-code/pull/2) | [Domain](https://falcon-code.deploysprint-finals.knurdz.org) / [manifest](https://falcon-code.deploysprint-finals.knurdz.org/domain-status.json) | A record targets `20.29.210.220`; TXT verification was completed through the organizer DNS portal, and the value stays outside the repository. |
 | T03 |  |  |  |
 | T04 | <!-- Add PR link --> | <!-- Add diagnostic run link and successful rollback run link --> | Implemented manual rollback workflow (.github/workflows/rollback.yml) with release_ref input, verified commit SHA resolution, and organizer deployer API redispatch. |
@@ -75,10 +78,27 @@ Use this section for short public notes and links. Full task instructions and ch
 | T29 |  |  |  |
 | T30 |  |  |  |
 
+## T03 Verification Note
+
+Implemented "Build Once Deploy Same Artifact" in `.github/workflows/`:
+
+**CI workflow (`ci.yml`):**
+- Builds `team-site/dist` with `npm run build`
+- Uploads the dist folder as artifact `site-dist-${{ github.sha }}` using `actions/upload-artifact@v4`
+
+**Deploy workflow (`deploy.yml`):**
+- Downloads the exact CI artifact using `actions/download-artifact@v4` with `name: site-dist-${{ github.sha }}` and `run-id` pointing to the CI run that produced it
+- Records artifact identity to `release-candidate/artifact-manifest.json` (`{"task":"T03","artifact":"site-dist-<sha>","sha":"<sha>","source_run_id":"<id>"}`)
+- Uploads `deploy-evidence-<sha>` artifact containing the manifest as evidence
+- Does **not** run `npm run build` — the same dist artifact from CI is reused
+
+Verified by inspecting both workflow files: only `ci.yml` runs the build, and `deploy.yml` consumes the artifact by name and source run ID.
+
 ## Public Notes
 
 List anything judges should know without exposing credentials or private infrastructure details.
 
+<!-- AI-REVIEW-MARKER: participant must manually remove this marker -->
 ### T02 verification
 
 - Assigned domain metadata: `ASSIGNED_DOMAIN=falcon-code.deploysprint-finals.knurdz.org`
