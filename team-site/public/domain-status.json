@@ -1,6 +1,9 @@
 {
+  "_aiReviewMarker": "AI-REVIEW-MARKER: participant must manually remove this marker",
+  "_aiAgentMarker": "AI-AGENT-MARKER: participant must manually remove this marker",
   "task": "T02",
   "team": "falcon-code",
+  "assignedDomain": "falcon-code.deploysprint-finals.knurdz.org",
   "domain": {
     "connected": true,
     "hostname": "falcon-code.deploysprint-finals.knurdz.org",
@@ -18,6 +21,7 @@
   },
   "evidence": {
     "status": "domain.connected=true",
+    "ASSIGNED_DOMAIN": "falcon-code.deploysprint-finals.knurdz.org",
     "dnsVerificationValue": "stored outside the repository"
   }
 }
