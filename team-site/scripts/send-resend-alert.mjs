@@ -10,8 +10,7 @@ const evidencePath = path.resolve(
   process.env.RESEND_EVIDENCE_PATH || 'resend-email-evidence.json',
 );
 
-// AI-REVIEW-MARKER: participant must manually remove this marker
-// AI-AGENT-MARKER: participant must manually remove this marker
+
 const emailStatus = {
   task: 'T16',
   provider: 'resend',
