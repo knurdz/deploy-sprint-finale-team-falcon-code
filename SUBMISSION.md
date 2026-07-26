@@ -98,7 +98,7 @@ Verified by inspecting both workflow files: only `ci.yml` runs the build, and `d
 
 List anything judges should know without exposing credentials or private infrastructure details.
 
-<!-- AI-REVIEW-MARKER: participant must manually remove this marker -->
+
 ### T02 verification
 
 - Assigned domain metadata: `ASSIGNED_DOMAIN=falcon-code.deploysprint-finals.knurdz.org`
