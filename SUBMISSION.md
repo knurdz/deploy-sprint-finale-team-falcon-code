@@ -45,7 +45,7 @@ Use this section for short public notes and links. Full task instructions and ch
 | Task | PR | Evidence | Notes |
 | --- | --- | --- | --- |
 | T01 |  |  |  |
-| T02 | Add the merged PR URL | [Domain](https://falcon-code.deploysprint-finals.knurdz.org) / [manifest](https://falcon-code.deploysprint-finals.knurdz.org/domain-status.json) | A record targets `20.29.210.220`; TXT value stays outside the repository. Verify DNS, HTTPS, HTTP, and raw-IP HTTP after the DNS portal action. |
+| T02 | [PR #2](https://github.com/knurdz/deploy-sprint-finale-team-falcon-code/pull/2) | [Domain](https://falcon-code.deploysprint-finals.knurdz.org) / [manifest](https://falcon-code.deploysprint-finals.knurdz.org/domain-status.json) | A record targets `20.29.210.220`; TXT verification was completed through the organizer DNS portal, and the value stays outside the repository. |
 | T03 |  |  |  |
 | T04 | <!-- Add PR link --> | <!-- Add diagnostic run link and successful rollback run link --> | Implemented manual rollback workflow (.github/workflows/rollback.yml) with release_ref input, verified commit SHA resolution, and organizer deployer API redispatch. |
 | T05 |  |  |  |
@@ -81,9 +81,10 @@ List anything judges should know without exposing credentials or private infrast
 
 ### T02 verification
 
+- Assigned domain metadata: `ASSIGNED_DOMAIN=falcon-code.deploysprint-finals.knurdz.org`
 - Assigned A record: `falcon-code` -> `20.29.210.220`
 - TXT record name: `_deploy-sprint-challenge.falcon-code`
-- TXT record value: configured only through the organizer DNS portal or GitHub secret
+- TXT verification: the record was created and validated through the organizer DNS portal; its value is stored only in the `DNS_TXT_VALUE` GitHub secret
 - Expected HTTPS evidence: `https://falcon-code.deploysprint-finals.knurdz.org`
 - Expected plain HTTP evidence: `http://falcon-code.deploysprint-finals.knurdz.org`
 - Expected raw-IP evidence: `http://20.29.210.220`
