@@ -55,5 +55,26 @@ if [[ "$after_failure_target" != "$healthy_target" ]]; then
   exit 1
 fi
 
+if [[ -e "$deploy_root/releases/broken-candidate" ]]; then
+  echo "T17 rehearsal failed: unhealthy candidate was published as a release." >&2
+  exit 1
+fi
+
+if compgen -G "$deploy_root/releases/.candidate-broken-candidate-*" > /dev/null; then
+  echo "T17 rehearsal failed: unhealthy candidate staging was not cleaned." >&2
+  exit 1
+fi
+
+echo "T17 rehearsal: retry the same release ID after fixing its health route."
+CANDIDATE_PORT="$candidate_port" \
+  bash "$deploy_script" "$deploy_root" "$healthy_source" "broken-candidate"
+
+retry_target="$(readlink "$deploy_root/current")"
+if [[ "$retry_target" != "$deploy_root/releases/broken-candidate" ]]; then
+  echo "T17 rehearsal failed: cleaned release ID could not be retried." >&2
+  exit 1
+fi
+
 echo "T17 PASS: candidate health check occurred before traffic switch."
 echo "T17 PASS: failed candidate left known-good release at $after_failure_target."
+echo "T17 PASS: failed candidate staging was cleaned and its release ID was retryable."

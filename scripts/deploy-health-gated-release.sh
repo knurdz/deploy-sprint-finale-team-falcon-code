@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-
 deploy_root="${1:?usage: deploy-health-gated-release.sh DEPLOY_ROOT CANDIDATE_SOURCE RELEASE_ID}"
 candidate_source="${2:?candidate source directory is required}"
 release_id="${3:-${GITHUB_SHA:-}}"
@@ -20,10 +19,12 @@ fi
 
 releases_dir="$deploy_root/releases"
 release_dir="$releases_dir/$release_id"
+candidate_dir="$releases_dir/.candidate-${release_id}-$$"
 current_link="$deploy_root/current"
 next_link="$deploy_root/.current-next"
 previous_release="none"
 candidate_pid=""
+candidate_published=false
 
 if [[ -L "$current_link" ]]; then
   previous_release="$(readlink "$current_link")"
@@ -35,6 +36,9 @@ cleanup() {
     wait "$candidate_pid" 2>/dev/null || true
   fi
   rm -f "$next_link"
+  if [[ "$candidate_published" != "true" && -d "$candidate_dir" ]]; then
+    rm -rf -- "$candidate_dir"
+  fi
 }
 trap cleanup EXIT
 
@@ -45,15 +49,16 @@ if [[ -e "$release_dir" ]]; then
   exit 2
 fi
 
-mkdir "$release_dir"
-cp -a "$candidate_source/." "$release_dir/"
+mkdir "$candidate_dir"
+cp -a "$candidate_source/." "$candidate_dir/"
 
-echo "T17 candidate release: $release_dir"
+echo "T17 candidate release target: $release_dir"
+echo "T17 isolated candidate directory: $candidate_dir"
 echo "T17 known-good before health check: $previous_release"
 
 python3 -m http.server "$candidate_port" \
   --bind 127.0.0.1 \
-  --directory "$release_dir" \
+  --directory "$candidate_dir" \
   >"$deploy_root/candidate-http.log" 2>&1 &
 candidate_pid="$!"
 
@@ -77,6 +82,20 @@ if [[ "$health_passed" != "true" ]]; then
 fi
 
 echo "T17 candidate health check passed."
+
+kill "$candidate_pid" 2>/dev/null || true
+wait "$candidate_pid" 2>/dev/null || true
+candidate_pid=""
+
+if [[ -e "$release_dir" ]]; then
+  echo "T17 release appeared during candidate validation: $release_dir" >&2
+  exit 2
+fi
+
+mv "$candidate_dir" "$release_dir"
+candidate_published=true
+echo "T17 candidate published to immutable release: $release_dir"
+
 ln -s "$release_dir" "$next_link"
 mv -Tf "$next_link" "$current_link"
 echo "T17 traffic switched atomically to: $(readlink "$current_link")"

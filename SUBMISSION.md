@@ -67,7 +67,7 @@ Use this section for short public notes and links. Full task instructions and ch
 | T14 |  |  |  |
 | T15 |  |  |  |
 | T16 |  |  |  |
-| T17 |  | CI artifact `t17-health-gate-${{ github.sha }}` and workflow summary | Candidate is copied to an immutable release directory, checked through its private HTTP endpoint, and atomically selected only after `/health/` returns `ok`; failure leaves `current` unchanged. |
+| T17 |  | CI artifact `t17-health-gate-${{ github.sha }}` and workflow summary | Candidate is isolated in a temporary release directory, checked through its private HTTP endpoint, and published plus atomically selected only after `/health/` returns `ok`; failure leaves `current` unchanged and cleans staging for a safe retry. |
 | T18 |  |  |  |
 | T19 |  |  |  |
 | T20 |  |  |  |
@@ -162,6 +162,7 @@ List anything judges should know without exposing credentials or private infrast
 - `scripts/deploy-health-gated-release.sh` stages each candidate under `releases/<release-id>` while the `current` symlink continues serving the known-good release.
 - The script starts a candidate-only HTTP server and verifies `/health/` before atomically replacing the `current` symlink.
 - A failed candidate exits before the switch and logs the unchanged known-good target.
+- Failed candidate staging is removed without publishing a release, allowing the same release ID to be retried after the health issue is fixed.
 - CI runs `scripts/test-health-gated-release.sh`, which proves both a successful switch and a failed-health preservation path.
 - The CI log is uploaded as `t17-health-gate-${{ github.sha }}` and copied into the workflow summary as fallback evidence tied to the scored commit.
 - The organizer dispatch requests the `health-gated-symlink` strategy without exposing or requiring participant-held VPS credentials.
