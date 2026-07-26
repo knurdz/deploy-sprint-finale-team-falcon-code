@@ -524,6 +524,54 @@ h3 {
   gap: 12px;
 }
 
+.readinessList {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.readinessList li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px;
+  border: 1px solid #e2dccf;
+  border-radius: 8px;
+  background: #f7f3eb;
+}
+
+.readinessStatus {
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.readinessStatus.ready {
+  background: #dcefdc;
+  color: #236237;
+}
+
+.readinessStatus.watch {
+  background: #f6e9c4;
+  color: #765812;
+}
+
+.readinessStatus.blocked {
+  background: #f4d9d3;
+  color: #8a3427;
+}
+
+.readinessSource {
+  margin: 16px 0 0;
+  color: #69756d;
+  font-size: 0.82rem;
+}
+
 .courseCard {
   display: grid;
   gap: 18px;

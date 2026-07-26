@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "build": "tsc --noEmit && npm run check:release-readiness && vite build && node scripts/generate-weather-evidence.mjs && node scripts/generate-release-evidence.mjs",
+    "check:release-readiness": "node scripts/check-release-readiness.mjs",
     "build": "tsc --noEmit && vite build && node scripts/generate-weather-evidence.mjs && node scripts/generate-contact-config.mjs && node scripts/generate-release-evidence.mjs",
     "preview": "vite preview",
     "lint": "tsc --noEmit"
