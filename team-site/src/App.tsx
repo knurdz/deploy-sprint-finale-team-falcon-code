@@ -28,8 +28,8 @@ export function App() {
             <GraduationCap size={24} />
           </div>
           <div>
-            <strong>Deploy Sprint</strong>
-            <span>Virtual LMS</span>
+            <strong>Falcon Code</strong>
+            <span>Deploy Sprint Finale</span>
           </div>
         </div>
 
@@ -54,14 +54,14 @@ export function App() {
 
         <div className="sidebarPanel">
           <ShieldCheck size={18} />
-          <p>Repository changes are reviewed before every release.</p>
+          <p>Team Falcon Code ships reviewed releases through GitHub Actions.</p>
         </div>
       </aside>
 
       <section className="workspace">
         <header className="topbar">
           <div>
-            <p className="eyebrow">Qualifier Dashboard</p>
+            <p className="eyebrow">Team Falcon Code</p>
             <h1>Learning operations at a glance</h1>
           </div>
 
@@ -86,7 +86,7 @@ export function App() {
           </div>
           <div className="heroSignal">
             <GitBranch size={32} />
-            <span>4 active learning tracks</span>
+            <span>T01 deployment candidate</span>
           </div>
         </section>
 
