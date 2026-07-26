@@ -15,6 +15,7 @@ import {
 import { useEffect, useState } from 'react';
 import { CourseCard } from './components/CourseCard';
 import { DeadlineBoard } from './components/DeadlineBoard';
+import { LearningVelocity } from './components/LearningVelocity';
 import { StatCard } from './components/StatCard';
 import { courses } from './data/courses';
 import { deadlineCards } from './data/deadlines';
@@ -79,8 +80,8 @@ export function App() {
             <GraduationCap size={24} />
           </div>
           <div>
-            <strong>Falcon Code</strong>
-            <span>Deploy Sprint Finale</span>
+            <strong>Deploy Sprint</strong>
+            <span>Virtual LMS</span>
           </div>
         </div>
 
@@ -109,14 +110,14 @@ export function App() {
 
         <div className="sidebarPanel">
           <ShieldCheck size={18} />
-          <p>Team Falcon Code ships reviewed releases through GitHub Actions.</p>
+          <p>Repository changes are reviewed before every release.</p>
         </div>
       </aside>
 
       <section className="workspace">
         <header className="topbar">
           <div>
-            <p className="eyebrow">Team Falcon Code</p>
+            <p className="eyebrow">Qualifier Dashboard</p>
             <h1>Learning operations at a glance</h1>
           </div>
 
@@ -141,7 +142,7 @@ export function App() {
           </div>
           <div className="heroSignal">
             <GitBranch size={32} />
-            <span>T01 deployment candidate</span>
+            <span>4 active learning tracks</span>
           </div>
         </section>
 
@@ -151,6 +152,7 @@ export function App() {
           ))}
         </section>
 
+        <LearningVelocity courses={courses} />
         <section className="weatherPanel" id="weather" aria-live="polite">
           <div className="weatherHeading">
             <div className="weatherIcon" aria-hidden="true">
