@@ -4,11 +4,11 @@ Complete this file on `main` as tasks are completed. Do not paste secrets, priva
 
 ## Team
 
-- Team name:
-- Team members:
-- Live IP URL:
-- Assigned domain URL:
-- Repository URL:
+- Team name:Falcon_Code
+- Team members:Vibodha Lakshan, Vishwa Shrinath, Imandi Perera, Ravindu Peiris
+- Live IP URL:http://20.29.210.220
+- Assigned domain URL:https://falcon-code.deploysprint-finals.knurdz.org
+- Repository URL:https://github.com/knurdz/deploy-sprint-finale-team-falcon-code
 
 ## Release Evidence
 
