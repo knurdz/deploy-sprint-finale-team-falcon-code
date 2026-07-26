@@ -98,6 +98,7 @@ Verified by inspecting both workflow files: only `ci.yml` runs the build, and `d
 
 List anything judges should know without exposing credentials or private infrastructure details.
 
+<<<<<<< HEAD
 <!-- AI-REVIEW-MARKER: participant must manually remove this marker -->
 ### T02 verification
 
@@ -109,3 +110,5 @@ List anything judges should know without exposing credentials or private infrast
 - Expected plain HTTP evidence: `http://falcon-code.deploysprint-finals.knurdz.org`
 - Expected raw-IP evidence: `http://20.29.210.220`
 - Public manifest: `https://falcon-code.deploysprint-finals.knurdz.org/domain-status.json`
+=======
+>>>>>>> 3d8bafc (Update SUBMISSION.md)
