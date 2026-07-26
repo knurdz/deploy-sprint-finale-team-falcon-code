@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: request-organizer-deploy
@@ -60,7 +61,33 @@ jobs:
             echo "sha=$sha"
             echo "branch=$branch"
             echo "source_run_id=$source_run_id"
+            echo "artifact_name=site-dist-$sha"
           } >> "$GITHUB_OUTPUT"
+
+      - name: Download CI dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ steps.request.outputs.artifact_name }}
+          path: ./release-candidate/dist
+          run-id: ${{ steps.request.outputs.source_run_id }}
+          github-token: ${{ github.token }}
+
+      - name: Record artifact identity
+        run: |
+          set -euo pipefail
+
+          mkdir -p release-candidate
+          printf '{"task":"T03","artifact":"%s","sha":"%s","source_run_id":"%s"}\n' \
+            "${{ steps.request.outputs.artifact_name }}" \
+            "${{ steps.request.outputs.sha }}" \
+            "${{ steps.request.outputs.source_run_id }}" \
+            > release-candidate/artifact-manifest.json
+
+      - name: Upload deploy evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-evidence-${{ steps.request.outputs.sha }}
+          path: release-candidate/artifact-manifest.json
 
       - name: Request deploy from organizer deployer
         env:
