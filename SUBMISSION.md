@@ -54,7 +54,7 @@ Use this section for short public notes and links. Full task instructions and ch
 | T05 |  | `/status` and `/runtime-config.json` | Runtime configuration is sourced from environment variables; the generated evidence exposes only configuration state and secret names, never secret values. |
 | T06 |  |  |  |
 | T07 |  |  |  |
-| T08 |  |  |  |
+| T08 | <!-- Add PR link --> | <!-- Add Evidence --> | Rebased organizer feature branch safely onto main. PR diff shows intended changes. |
 | T09 |  |  |  |
 | T10 |  |  |  |
 | T11 |  |  |  |
@@ -117,3 +117,10 @@ List anything judges should know without exposing credentials or private infrast
 - `/status` includes redacted `runtimeConfig` evidence for T05.
 - `/runtime-config.json` reports whether public configuration exists and confirms `secretsRedacted=true`.
 - Local builds use the safe `not-configured` fallback instead of a committed infrastructure value.
+
+### T08 verification
+
+- Rebased and cherry-picked the organizer branch `task-assets/rebase-feature` safely onto `main`.
+- Ensured a clean git history without force pushing to `main`.
+- Integrated the `LearningVelocity.tsx` component into the app dashboard.
+
