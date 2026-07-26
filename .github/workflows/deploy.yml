@@ -15,7 +15,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: request-organizer-deploy
+  group: ${{ github.repository }}-production-deploy
   cancel-in-progress: false
 
 jobs:
