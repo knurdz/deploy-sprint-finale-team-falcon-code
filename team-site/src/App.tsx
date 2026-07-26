@@ -52,6 +52,15 @@ type ContactConfig = {
 
 type ContactState = 'idle' | 'sending' | 'success' | 'error';
 
+type FeatureFlags = {
+  task: 'T15';
+  flagName: 'FEATURE_SHOW_INSIGHTS';
+  enabled: boolean;
+  showInsights: boolean;
+  redacted: true;
+  valueRedacted: true;
+};
+
 export function App() {
 
   const averageProgress = getAverageProgress(courses);
@@ -60,6 +69,8 @@ export function App() {
   const [contactConfig, setContactConfig] = useState<ContactConfig | null>(null);
   const [contactState, setContactState] = useState<ContactState>('idle');
   const [contactMessage, setContactMessage] = useState('');
+  const [featureFlags, setFeatureFlags] = useState<FeatureFlags | null>(null);
+
 
   useEffect(() => {
     let active = true;
@@ -84,6 +95,40 @@ export function App() {
       })
       .catch(() => {
         if (active) setWeatherError('Weather data is unavailable.');
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    fetch('/config/feature-flags.json', {
+      headers: { Accept: 'application/json' },
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Feature flags returned ${response.status}.`);
+        }
+
+        return (await response.json()) as FeatureFlags;
+      })
+      .then((payload) => {
+        if (active) setFeatureFlags(payload);
+      })
+      .catch(() => {
+        if (active) {
+          setFeatureFlags({
+            task: 'T15',
+            flagName: 'FEATURE_SHOW_INSIGHTS',
+            enabled: false,
+            showInsights: false,
+            redacted: true,
+            valueRedacted: true,
+          });
+        }
       });
 
     return () => {
@@ -202,6 +247,12 @@ export function App() {
             <Mail size={18} />
             Contact
           </a>
+          {featureFlags?.enabled && (
+            <a href="#insights">
+              <Activity size={18} />
+              Insights
+            </a>
+          )}
           <a href="#teams">
             <Users size={18} />
             Teams
@@ -254,6 +305,19 @@ export function App() {
 
 
         <LearningVelocity courses={courses} />
+        {featureFlags?.enabled && (
+          <section className="insightsPanel" id="insights">
+            <div>
+              <p className="eyebrow">Runtime feature</p>
+              <h2>Learning insights enabled</h2>
+              <p>
+                The cohort is progressing at {averageProgress}% across{' '}
+                {courses.length} active learning modules.
+              </p>
+            </div>
+            <span>Feature flag active</span>
+          </section>
+        )}
         <ReleaseReadiness />
         <section className="weatherPanel" id="weather" aria-live="polite">
           <div className="weatherHeading">
