@@ -156,7 +156,7 @@ jobs:
           set -euo pipefail
 
           mkdir -p release-candidate
-          printf '{"task":"T03","artifact":"%s","sha":"%s","source_run_id":"%s"}\n' \
+          printf '{"tasks":["T03","T17"],"artifact":"%s","sha":"%s","source_run_id":"%s","deployment_strategy":"health-gated-symlink","health_path":"/health/","release_script":"scripts/deploy-health-gated-release.sh"}\n' \
             "${{ steps.request.outputs.artifact_name }}" \
             "${{ steps.request.outputs.sha }}" \
             "${{ steps.source.outputs.source_run_id }}" \
@@ -196,6 +196,9 @@ jobs:
                   "sha": os.environ["TEAM_SHA"],
                   "branch": os.environ["TEAM_BRANCH"],
                   "source_run_id": os.environ["SOURCE_RUN_ID"],
+                  "deployment_strategy": "health-gated-symlink",
+                  "health_path": "/health/",
+                  "release_script": "scripts/deploy-health-gated-release.sh",
               },
           }
 
